@@ -8,6 +8,12 @@ import (
 func main() {
 	data, _ := os.ReadFile("./words.txt")
 
+	wordCount := countWords(data)
+
+	fmt.Println(wordCount)
+}
+
+func countWords(data []byte) int {
 	wordCount := 0
 
 	const spaceCharRune = ' ' // or const spaceCharASCII = 32 where 32 is the ASCII value of the Space character
@@ -20,5 +26,5 @@ func main() {
 
 	wordCount++
 
-	fmt.Println(wordCount)
+	return wordCount
 }
