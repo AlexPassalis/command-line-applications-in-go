@@ -11,10 +11,6 @@ import (
 func main() {
 	log.SetFlags(0) // clears all log built-in prefixes.
 
-	if len(os.Args) < 2 {
-		log.Fatalln("error: no filename provided")
-	}
-
 	total := 0
 
 	didError := false
@@ -28,6 +24,11 @@ func main() {
 		}
 		total += wordCount
 		fmt.Println(wordCount, filename)
+	}
+
+	if len(filenames) == 0 {
+		wordCount := CountWords(os.Stdin)
+		fmt.Println(wordCount)
 	}
 
 	if len(filenames) > 1 {
