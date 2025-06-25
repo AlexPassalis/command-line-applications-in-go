@@ -3,9 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"log"
 	"os"
-	"strings"
 )
 
 func main() {
@@ -15,12 +15,12 @@ func main() {
 		log.Fatalln("failed to read file:", err)
 	}
 
-	wordCount := CountWordsInFile(file)
+	wordCount := CountWords(file)
 	fmt.Println(wordCount)
 
 }
 
-func CountWordsInFile(file *os.File) int {
+func CountWords(file io.Reader) int {
 	wordCount := 0
 
 	scanner := bufio.NewScanner(file)
@@ -31,9 +31,4 @@ func CountWordsInFile(file *os.File) int {
 	}
 
 	return wordCount
-}
-
-func CountWords(data []byte) int {
-	words := strings.Fields(string(data))
-	return len(words)
 }
