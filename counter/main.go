@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -14,18 +15,6 @@ func main() {
 }
 
 func CountWords(data []byte) int {
-	wordCount := 0
-
-	wasSpace := true
-	for _, x := range data {
-		isSpace := (x == ' ' || x == '\n')
-
-		if wasSpace && !isSpace {
-			wordCount++
-		}
-
-		wasSpace = isSpace
-	}
-
-	return wordCount
+	words := strings.Fields(string(data))
+	return len(words)
 }

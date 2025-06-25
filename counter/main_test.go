@@ -1,6 +1,10 @@
-package main
+package main_test
 
-import "testing"
+import (
+	"testing"
+
+	counter "github.com/AlexPassalis/command-line-applications-in-go"
+)
 
 func TestCountWords(t *testing.T) {
 	testCases := []struct {
@@ -52,7 +56,7 @@ func TestCountWords(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			result := CountWords([]byte(tc.input))
+			result := counter.CountWords([]byte(tc.input))
 			if result != tc.wants {
 				t.Logf("expected: %d got %d", tc.wants, result)
 				t.Fail()
