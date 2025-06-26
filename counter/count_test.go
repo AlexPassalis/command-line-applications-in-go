@@ -195,7 +195,7 @@ func TestGetCounts(t *testing.T) {
 func TestPrintCounts(t *testing.T) {
 	type inputs struct {
 		counts   counter.Counts
-		filename string
+		filename []string
 	}
 
 	testCases := []struct {
@@ -211,7 +211,7 @@ func TestPrintCounts(t *testing.T) {
 					Words: 5,
 					Bytes: 24,
 				},
-				filename: "words.txt",
+				filename: []string{"words.txt"},
 			},
 			wants: "1 5 24 words.txt\n",
 		},
@@ -223,7 +223,6 @@ func TestPrintCounts(t *testing.T) {
 					Words: 4,
 					Bytes: 20,
 				},
-				filename: "",
 			},
 			wants: "1 4 20\n",
 		},
@@ -232,7 +231,7 @@ func TestPrintCounts(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			buffer := &bytes.Buffer{}
-			tc.input.counts.Print(buffer, tc.input.filename)
+			tc.input.counts.Print(buffer, tc.input.filename...)
 			if buffer.String() != tc.wants {
 				t.Logf("expected: %s got %s", tc.wants, buffer.String())
 				t.Fail()
