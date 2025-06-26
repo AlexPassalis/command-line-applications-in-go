@@ -20,11 +20,8 @@ func main() {
 			fmt.Fprintln(os.Stderr, "counter:", err)
 			continue
 		}
-		totals = Counts{
-			Bytes: totals.Bytes + counts.Bytes,
-			Words: totals.Words + counts.Words,
-			Lines: totals.Lines + counts.Lines,
-		}
+
+		totals = totals.Add(counts)
 
 		counts.Print(os.Stdout, filename)
 	}
