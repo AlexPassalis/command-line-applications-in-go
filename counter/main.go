@@ -9,7 +9,7 @@ import (
 func main() {
 	log.SetFlags(0) // clears all log built-in prefixes.
 
-	total := 0
+	totals := Counts{}
 
 	didError := false
 	filenames := os.Args[1:]
@@ -20,21 +20,24 @@ func main() {
 			fmt.Fprintln(os.Stderr, "counter:", err)
 			continue
 		}
-		total += counts.Words
-		fmt.Println(counts.Lines, counts.Words, counts.Bytes, filename)
+		totals = Counts{
+			Bytes: totals.Bytes + counts.Bytes,
+			Words: totals.Words + counts.Words,
+			Lines: totals.Lines + counts.Lines,
+		}
+
+		counts.Print(os.Stdout, filename)
 	}
 
 	if len(filenames) == 0 {
-		counts := GetCounts(os.Stdin)
-		fmt.Println(counts.Lines, counts.Words, counts.Bytes)
+		GetCounts(os.Stdin).Print(os.Stdout, "")
 	}
 
 	if len(filenames) > 1 {
-		fmt.Println(total, "total")
+		totals.Print(os.Stdout, "total")
 	}
 
 	if didError {
 		os.Exit(1)
 	}
 }
-	
