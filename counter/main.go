@@ -20,13 +20,13 @@ func main() {
 			fmt.Fprintln(os.Stderr, "counter:", err)
 			continue
 		}
-		total += counts.words
-		fmt.Println(counts.lines, counts.words, counts.bytes, filename)
+		total += counts.Words
+		fmt.Println(counts.Lines, counts.Words, counts.Bytes, filename)
 	}
 
 	if len(filenames) == 0 {
-		wordCount := CountWords(os.Stdin)
-		fmt.Println(wordCount)
+		counts := GetCounts(os.Stdin)
+		fmt.Println(counts.Lines, counts.Words, counts.Bytes)
 	}
 
 	if len(filenames) > 1 {
@@ -37,3 +37,4 @@ func main() {
 		os.Exit(1)
 	}
 }
+	

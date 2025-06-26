@@ -6,28 +6,40 @@ import (
 	"os"
 )
 
-type counts struct {
-	bytes int
-	words int
-	lines int
+type Counts struct {
+	Bytes int
+	Words int
+	Lines int
 }
 
-func CountFile(filename string) (counts, error) {
+func GetCounts(file io.ReadSeeker) Counts {
+	const offsetStart = 0
+
+	lineCount := CountLines(file)
+
+	file.Seek(offsetStart, io.SeekStart)
+	byteCount := CountBytes(file)
+
+	file.Seek(offsetStart, io.SeekStart)
+	wordCount := CountWords(file)
+
+	return Counts{
+		Bytes: byteCount,
+		Words: wordCount,
+		Lines: lineCount,
+	}
+}
+
+func CountFile(filename string) (Counts, error) {
 	file, err := os.Open(filename)
 	if err != nil {
-		return counts{}, err
+		return Counts{}, err
 	}
 	defer file.Close()
 
-	lineCount := CountLines(file)
-	byteCount := CountBytes(file)
-	wordCount := CountWords(file)
+	counts := GetCounts(file)
 
-	return counts{
-		bytes: byteCount,
-		words: wordCount,
-		lines: lineCount,
-	}, nil
+	return counts, nil
 }
 
 func CountWords(file io.Reader) int {
