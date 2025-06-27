@@ -1,4 +1,4 @@
-package main_test
+package count_test
 
 import (
 	"bytes"
@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	counter "github.com/AlexPassalis/command-line-applications-in-go"
+	display "github.com/AlexPassalis/command-line-applications-in-go/display"
 )
 
 func TestCountWords(t *testing.T) {
@@ -195,7 +196,7 @@ func TestGetCounts(t *testing.T) {
 func TestPrintCounts(t *testing.T) {
 	type inputs struct {
 		counts   counter.Counts
-		options  counter.DisplayOptions
+		options  display.Options
 		filename []string
 	}
 
@@ -213,7 +214,7 @@ func TestPrintCounts(t *testing.T) {
 					Bytes: 24,
 				},
 				filename: []string{"words.txt"},
-				options: counter.DisplayOptions{
+				options: display.Options{
 					ShowLines: true,
 					ShowWords: true,
 					ShowBytes: true,
@@ -230,7 +231,7 @@ func TestPrintCounts(t *testing.T) {
 					Bytes: 24,
 				},
 				filename: []string{"words.txt"},
-				options: counter.DisplayOptions{
+				options: display.Options{
 					ShowLines: true,
 					ShowWords: false,
 					ShowBytes: false,
@@ -259,7 +260,7 @@ func TestPrintCounts(t *testing.T) {
 					Bytes: 24,
 				},
 				filename: []string{"words.txt"},
-				options: counter.DisplayOptions{
+				options: display.Options{
 					ShowLines: false,
 					ShowWords: true,
 					ShowBytes: false,
@@ -276,7 +277,7 @@ func TestPrintCounts(t *testing.T) {
 					Bytes: 24,
 				},
 				filename: []string{"words.txt"},
-				options: counter.DisplayOptions{
+				options: display.Options{
 					ShowLines: true,
 					ShowWords: false,
 					ShowBytes: true,
@@ -293,7 +294,7 @@ func TestPrintCounts(t *testing.T) {
 					Bytes: 24,
 				},
 				filename: []string{"words.txt"},
-				options: counter.DisplayOptions{
+				options: display.Options{
 					ShowLines: true,
 					ShowWords: true,
 					ShowBytes: true,

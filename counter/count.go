@@ -1,4 +1,4 @@
-package main
+package count
 
 import (
 	"bufio"
@@ -8,6 +8,8 @@ import (
 	"strconv"
 	"strings"
 	"unicode"
+
+	display "github.com/AlexPassalis/command-line-applications-in-go/display"
 )
 
 type Counts struct {
@@ -24,7 +26,7 @@ func (c Counts) Add(other Counts) Counts {
 	return c
 }
 
-func (c Counts) Print(writer io.Writer, options DisplayOptions, suffixes ...string) {
+func (c Counts) Print(writer io.Writer, options display.Options, suffixes ...string) {
 	stats := []string{}
 
 	if options.ShouldShowHeader() {

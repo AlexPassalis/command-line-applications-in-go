@@ -6,49 +6,13 @@ import (
 	"log"
 	"os"
 	"text/tabwriter"
+
+	counter "github.com/AlexPassalis/command-line-applications-in-go"
+	display "github.com/AlexPassalis/command-line-applications-in-go/display"
 )
 
-type DisplayOptions struct {
-	ShowBytes  bool
-	ShowWords  bool
-	ShowLines  bool
-	ShowHeader bool
-}
-
-func (d DisplayOptions) ShouldShowBytes() bool {
-	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
-		return true
-	}
-
-	return d.ShowBytes
-}
-
-func (d DisplayOptions) ShouldShowWords() bool {
-	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
-		return true
-	}
-
-	return d.ShowWords
-}
-
-func (d DisplayOptions) ShouldShowLines() bool {
-	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
-		return true
-	}
-
-	return d.ShowLines
-}
-
-func (d DisplayOptions) ShouldShowHeader() bool {
-	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
-		return true
-	}
-
-	return d.ShowHeader
-}
-
 func main() {
-	options := DisplayOptions{}
+	options := display.Options{}
 
 	flag.BoolVar(
 		&options.ShowWords,
@@ -84,7 +48,7 @@ func main() {
 
 	writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, ' ', tabwriter.AlignRight)
 
-	totals := Counts{}
+	totals := counter.Counts{}
 
 	if options.ShowHeader {
 		fmt.Fprintln(os.Stdout, "lines\twords\tbytes")
@@ -93,7 +57,7 @@ func main() {
 	didError := false
 	filenames := flag.Args()
 	for _, filename := range filenames {
-		counts, err := CountFile(filename)
+		counts, err := counter.CountFile(filename)
 		if err != nil {
 			didError = true
 			fmt.Fprintln(os.Stderr, "counter:", err)
@@ -106,7 +70,7 @@ func main() {
 	}
 
 	if len(filenames) == 0 {
-		GetCounts(os.Stdin).Print(writer, options)
+		counter.GetCounts(os.Stdin).Print(writer, options)
 	}
 
 	if len(filenames) > 1 {
