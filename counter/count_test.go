@@ -219,7 +219,7 @@ func TestPrintCounts(t *testing.T) {
 					ShowBytes: true,
 				},
 			},
-			wants: "1 5 24 words.txt\n",
+			wants: "1\t5\t24\t words.txt\n",
 		},
 		{
 			name: "simple five words.txt show lines",
@@ -236,7 +236,7 @@ func TestPrintCounts(t *testing.T) {
 					ShowBytes: false,
 				},
 			},
-			wants: "1 words.txt\n",
+			wants: "1\t words.txt\n",
 		},
 		{
 			name: "simple five words.txt no options",
@@ -248,7 +248,7 @@ func TestPrintCounts(t *testing.T) {
 				},
 				filename: []string{"words.txt"},
 			},
-			wants: "1 5 24 words.txt\n",
+			wants: "1\t5\t24\t words.txt\n",
 		},
 		{
 			name: "simple five words.txt show words",
@@ -265,7 +265,7 @@ func TestPrintCounts(t *testing.T) {
 					ShowBytes: false,
 				},
 			},
-			wants: "5 words.txt\n",
+			wants: "5\t words.txt\n",
 		},
 		{
 			name: "simple five words.txt show bytes and lines",
@@ -282,7 +282,7 @@ func TestPrintCounts(t *testing.T) {
 					ShowBytes: true,
 				},
 			},
-			wants: "1 24 words.txt\n",
+			wants: "1\t24\t words.txt\n",
 		},
 		{
 			name: "empty filename",
@@ -299,7 +299,7 @@ func TestPrintCounts(t *testing.T) {
 					ShowBytes: true,
 				},
 			},
-			wants: "1 5 24 words.txt\n",
+			wants: "1\t5\t24\t words.txt\n",
 		},
 	}
 

@@ -5,16 +5,18 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"text/tabwriter"
 )
 
 type DisplayOptions struct {
-	ShowBytes bool
-	ShowWords bool
-	ShowLines bool
+	ShowBytes  bool
+	ShowWords  bool
+	ShowLines  bool
+	ShowHeader bool
 }
 
 func (d DisplayOptions) ShouldShowBytes() bool {
-	if !d.ShowBytes && !d.ShowWords && !d.ShowLines {
+	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
 		return true
 	}
 
@@ -22,7 +24,7 @@ func (d DisplayOptions) ShouldShowBytes() bool {
 }
 
 func (d DisplayOptions) ShouldShowWords() bool {
-	if !d.ShowBytes && !d.ShowWords && !d.ShowLines {
+	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
 		return true
 	}
 
@@ -30,11 +32,19 @@ func (d DisplayOptions) ShouldShowWords() bool {
 }
 
 func (d DisplayOptions) ShouldShowLines() bool {
-	if !d.ShowBytes && !d.ShowWords && !d.ShowLines {
+	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
 		return true
 	}
 
 	return d.ShowLines
+}
+
+func (d DisplayOptions) ShouldShowHeader() bool {
+	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
+		return true
+	}
+
+	return d.ShowHeader
 }
 
 func main() {
@@ -61,11 +71,24 @@ func main() {
 		"Used to toggle whether or not to show the byte count",
 	)
 
+	flag.BoolVar(
+		&options.ShowHeader,
+		"header",
+		false,
+		"Used to toggle whether or not to show the counts header",
+	)
+
 	flag.Parse()
 
 	log.SetFlags(0) // clears all log built-in prefixes.
 
+	writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, ' ', tabwriter.AlignRight)
+
 	totals := Counts{}
+
+	if options.ShowHeader {
+		fmt.Fprintln(os.Stdout, "lines\twords\tbytes")
+	}
 
 	didError := false
 	filenames := flag.Args()
@@ -83,12 +106,14 @@ func main() {
 	}
 
 	if len(filenames) == 0 {
-		GetCounts(os.Stdin).Print(os.Stdout, options)
+		GetCounts(os.Stdin).Print(writer, options)
 	}
 
 	if len(filenames) > 1 {
 		totals.Print(os.Stdout, options, "total")
 	}
+
+	writer.Flush()
 
 	if didError {
 		os.Exit(1)
