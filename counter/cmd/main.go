@@ -8,7 +8,7 @@ import (
 	"text/tabwriter"
 
 	counter "github.com/AlexPassalis/command-line-applications-in-go"
-	"github.com/AlexPassalis/command-line-applications-in-go/display"
+	display "github.com/AlexPassalis/command-line-applications-in-go/display"
 )
 
 func main() {

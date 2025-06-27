@@ -1,11 +1,10 @@
-package count_test
+package count
 
 import (
 	"bytes"
 	"strings"
 	"testing"
 
-	counter "github.com/AlexPassalis/command-line-applications-in-go"
 	display "github.com/AlexPassalis/command-line-applications-in-go/display"
 )
 
@@ -60,7 +59,7 @@ func TestCountWords(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			r := strings.NewReader(tc.input)
-			result := counter.GetCounts(r).Words
+			result := GetCounts(r).words
 			if result != tc.wants {
 				t.Logf("expected: %d got %d", tc.wants, result)
 				t.Fail()
@@ -110,7 +109,7 @@ func TestCountLines(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			r := strings.NewReader(tc.input)
-			result := counter.GetCounts(r).Lines
+			result := GetCounts(r).lines
 			if result != tc.wants {
 				t.Logf("expected: %d got %d", tc.wants, result)
 				t.Fail()
@@ -155,7 +154,7 @@ func TestCountBytes(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			r := strings.NewReader(tc.input)
-			result := counter.GetCounts(r).Bytes
+			result := GetCounts(r).bytes
 			if result != tc.wants {
 				t.Logf("expected: %d got %d", tc.wants, result)
 				t.Fail()
@@ -168,15 +167,15 @@ func TestGetCounts(t *testing.T) {
 	testCases := []struct {
 		name  string
 		input string
-		wants counter.Counts
+		wants Counts
 	}{
 		{
 			name:  "simple five words",
 			input: "one two three four five\n",
-			wants: counter.Counts{
-				Lines: 1,
-				Words: 5,
-				Bytes: 24,
+			wants: Counts{
+				lines: 1,
+				words: 5,
+				bytes: 24,
 			},
 		},
 	}
@@ -184,7 +183,7 @@ func TestGetCounts(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			r := strings.NewReader(tc.input)
-			result := counter.GetCounts(r)
+			result := GetCounts(r)
 			if result != tc.wants {
 				t.Logf("expected: %d got %d", tc.wants, result)
 				t.Fail()
@@ -195,7 +194,7 @@ func TestGetCounts(t *testing.T) {
 
 func TestPrintCounts(t *testing.T) {
 	type inputs struct {
-		counts   counter.Counts
+		counts   Counts
 		options  display.NewOptionsArguments
 		filename []string
 	}
@@ -208,10 +207,10 @@ func TestPrintCounts(t *testing.T) {
 		{
 			name: "simple five words.txt",
 			input: inputs{
-				counts: counter.Counts{
-					Lines: 1,
-					Words: 5,
-					Bytes: 24,
+				counts: Counts{
+					lines: 1,
+					words: 5,
+					bytes: 24,
 				},
 				filename: []string{"words.txt"},
 				options: display.NewOptionsArguments{
@@ -225,10 +224,10 @@ func TestPrintCounts(t *testing.T) {
 		{
 			name: "simple five words.txt show lines",
 			input: inputs{
-				counts: counter.Counts{
-					Lines: 1,
-					Words: 5,
-					Bytes: 24,
+				counts: Counts{
+					lines: 1,
+					words: 5,
+					bytes: 24,
 				},
 				filename: []string{"words.txt"},
 				options: display.NewOptionsArguments{
@@ -242,10 +241,10 @@ func TestPrintCounts(t *testing.T) {
 		{
 			name: "simple five words.txt no options",
 			input: inputs{
-				counts: counter.Counts{
-					Lines: 1,
-					Words: 5,
-					Bytes: 24,
+				counts: Counts{
+					lines: 1,
+					words: 5,
+					bytes: 24,
 				},
 				filename: []string{"words.txt"},
 			},
@@ -254,10 +253,10 @@ func TestPrintCounts(t *testing.T) {
 		{
 			name: "simple five words.txt show words",
 			input: inputs{
-				counts: counter.Counts{
-					Lines: 1,
-					Words: 5,
-					Bytes: 24,
+				counts: Counts{
+					lines: 1,
+					words: 5,
+					bytes: 24,
 				},
 				filename: []string{"words.txt"},
 				options: display.NewOptionsArguments{
@@ -271,10 +270,10 @@ func TestPrintCounts(t *testing.T) {
 		{
 			name: "simple five words.txt show bytes and lines",
 			input: inputs{
-				counts: counter.Counts{
-					Lines: 1,
-					Words: 5,
-					Bytes: 24,
+				counts: Counts{
+					lines: 1,
+					words: 5,
+					bytes: 24,
 				},
 				filename: []string{"words.txt"},
 				options: display.NewOptionsArguments{
@@ -288,10 +287,10 @@ func TestPrintCounts(t *testing.T) {
 		{
 			name: "empty filename",
 			input: inputs{
-				counts: counter.Counts{
-					Lines: 1,
-					Words: 5,
-					Bytes: 24,
+				counts: Counts{
+					lines: 1,
+					words: 5,
+					bytes: 24,
 				},
 				filename: []string{"words.txt"},
 				options: display.NewOptionsArguments{
@@ -318,33 +317,33 @@ func TestPrintCounts(t *testing.T) {
 
 func TestAddCounts(t *testing.T) {
 	type inputs struct {
-		counts counter.Counts
-		other  counter.Counts
+		counts Counts
+		other  Counts
 	}
 
 	testCases := []struct {
 		name  string
 		input inputs
-		wants counter.Counts
+		wants Counts
 	}{
 		{
 			name: "simple add by one",
 			input: inputs{
-				counts: counter.Counts{
-					Lines: 1,
-					Words: 5,
-					Bytes: 24,
+				counts: Counts{
+					lines: 1,
+					words: 5,
+					bytes: 24,
 				},
-				other: counter.Counts{
-					Lines: 1,
-					Words: 1,
-					Bytes: 1,
+				other: Counts{
+					lines: 1,
+					words: 1,
+					bytes: 1,
 				},
 			},
-			wants: counter.Counts{
-				Lines: 2,
-				Words: 6,
-				Bytes: 25,
+			wants: Counts{
+				lines: 2,
+				words: 6,
+				bytes: 25,
 			},
 		},
 	}
