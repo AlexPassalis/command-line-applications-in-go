@@ -63,10 +63,6 @@ func main() {
 
 	flag.Parse()
 
-	fmt.Println("showWords:", options.ShowWords)
-	fmt.Println("showBytes:", options.ShowBytes)
-	fmt.Println("showLines:", options.ShowLines)
-
 	log.SetFlags(0) // clears all log built-in prefixes.
 
 	totals := Counts{}
