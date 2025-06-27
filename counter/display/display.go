@@ -1,36 +1,46 @@
 package display
 
 type Options struct {
-	ShowBytes  bool
-	ShowWords  bool
-	ShowLines  bool
-	ShowHeader bool
+	arguments NewOptionsArguments
+}
+
+type NewOptionsArguments struct {
+	ShowBytes   bool
+	ShowWords   bool
+	ShowLines   bool
+	ShowHeaders bool
+}
+
+func NewOptions(arguments NewOptionsArguments) Options {
+	return Options{
+		arguments: arguments,
+	}
 }
 
 func (d Options) ShouldShowBytes() bool {
-	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
+	if !d.arguments.ShowBytes && !d.arguments.ShowWords && !d.arguments.ShowLines && !d.arguments.ShowHeaders {
 		return true
 	}
 
-	return d.ShowBytes
+	return d.arguments.ShowBytes
 }
 
 func (d Options) ShouldShowWords() bool {
-	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
+	if !d.arguments.ShowBytes && !d.arguments.ShowWords && !d.arguments.ShowLines && !d.arguments.ShowHeaders {
 		return true
 	}
 
-	return d.ShowWords
+	return d.arguments.ShowWords
 }
 
 func (d Options) ShouldShowLines() bool {
-	if !d.ShowBytes && !d.ShowWords && !d.ShowLines && !d.ShowHeader {
+	if !d.arguments.ShowBytes && !d.arguments.ShowWords && !d.arguments.ShowLines && !d.arguments.ShowHeaders {
 		return true
 	}
 
-	return d.ShowLines
+	return d.arguments.ShowLines
 }
 
 func (d Options) ShouldShowHeader() bool {
-	return d.ShowHeader
+	return d.arguments.ShowHeaders
 }
