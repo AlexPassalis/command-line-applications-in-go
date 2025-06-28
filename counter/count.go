@@ -2,6 +2,7 @@ package count
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -57,7 +58,61 @@ func (c Counts) Print(writer io.Writer, options display.Options, suffixes ...str
 	fmt.Fprint(writer, "\n")
 }
 
-func GetCounts(file io.Reader) Counts {
+func CountWords(file io.Reader) int {
+	wordCount := 0
+
+	scanner := bufio.NewScanner(file)
+	scanner.Split(bufio.ScanWords)
+
+	for scanner.Scan() {
+		wordCount++
+	}
+
+	return wordCount
+}
+
+func CountLines(r io.Reader) int {
+	linesCount := 0
+
+	reader := bufio.NewReader(r)
+	for {
+		rune, _, err := reader.ReadRune()
+		if err != nil {
+			break
+		}
+
+		if rune == '\n' {
+			linesCount++
+		}
+	}
+
+	return linesCount
+}
+
+func CountBytes(reader io.Reader) int {
+	byteCount, _ := io.Copy(io.Discard, reader)
+	return int(byteCount)
+}
+
+func GetCounts(r io.Reader) Counts {
+	buffer1 := &bytes.Buffer{}
+	buffer2 := &bytes.Buffer{}
+	byteReader := io.TeeReader(r, buffer1)
+	wordReader := io.TeeReader(buffer1, buffer2)
+	linesReader := buffer2
+
+	byteCount := CountBytes(byteReader)
+	wordCount := CountWords(wordReader)
+	lineCount := CountLines(linesReader)
+
+	return Counts{
+		bytes: byteCount,
+		words: wordCount,
+		lines: lineCount,
+	}
+}
+
+func GetCountsSinglePass(file io.Reader) Counts {
 	res := Counts{}
 
 	isInsideWord := false
@@ -96,41 +151,4 @@ func CountFile(filename string) (Counts, error) {
 	counts := GetCounts(file)
 
 	return counts, nil
-}
-
-func CountWords(file io.Reader) int {
-	wordCount := 0
-
-	scanner := bufio.NewScanner(file)
-	scanner.Split(bufio.ScanWords)
-
-	for scanner.Scan() {
-		wordCount++
-	}
-
-	return wordCount
-}
-
-func CountLines(r io.Reader) int {
-	linesCount := 0
-
-	reader := bufio.NewReader(r)
-	for {
-		rune, _, err := reader.ReadRune()
-		if err != nil {
-			break
-		}
-
-		if rune == '\n' {
-			linesCount++
-		}
-
-	}
-
-	return linesCount
-}
-
-func CountBytes(reader io.Reader) int {
-	byteCount, _ := io.Copy(io.Discard, reader)
-	return int(byteCount)
 }
