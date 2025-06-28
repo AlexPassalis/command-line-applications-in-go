@@ -15,6 +15,7 @@ import (
 type FileCountsResult struct {
 	counts   counter.Counts
 	filename string
+	err      error
 }
 
 func main() {
@@ -66,33 +67,17 @@ func main() {
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(len(filenames))
 
-	channel := make(chan FileCountsResult)
-
 	didError := false
-	for _, filename := range filenames {
-		go func() {
-			defer waitGroup.Done()
 
-			counts, err := counter.CountFile(filename)
-			if err != nil {
-				didError = true
-				fmt.Fprintln(os.Stderr, "counter:", err)
-				return
-			}
-
-			channel <- FileCountsResult{
-				counts:   counts,
-				filename: filename,
-			}
-		}()
-	}
-
-	go func() {
-		waitGroup.Wait()
-		close(channel)
-	}()
+	channel := CountFiles(filenames)
 
 	for result := range channel {
+		if result.err != nil {
+			didError = true
+			fmt.Fprintln(os.Stderr, "counter:", result.err)
+			continue
+		}
+
 		totals = totals.Add(result.counts)
 		result.counts.Print(tabWriter, options, result.filename)
 	}
@@ -110,4 +95,41 @@ func main() {
 	if didError {
 		os.Exit(1)
 	}
+}
+
+func CountFiles(filenames []string) <-chan FileCountsResult { // typeof receive only channel
+	channel := make(chan FileCountsResult)
+
+	waitGroup := sync.WaitGroup{}
+	waitGroup.Add(len(filenames))
+
+	for _, filename := range filenames {
+		go func() {
+			defer waitGroup.Done()
+
+			result, err := CountsForFile(filename)
+			channel <- FileCountsResult{
+				counts:   result,
+				filename: filename,
+				err:      err,
+			}
+		}()
+	}
+
+	go func() {
+		waitGroup.Wait()
+		close(channel)
+	}()
+
+	return channel
+}
+
+func CountsForFile(filename string) (counter.Counts, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return counter.Counts{}, err
+	}
+	defer file.Close()
+
+	return counter.GetCounts(file), nil
 }
