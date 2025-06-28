@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	display "github.com/AlexPassalis/command-line-applications-in-go/display"
+	display "github.com/AlexPassalis/command-line-applications-in-go/counter/display"
 )
 
 func TestCountWords(t *testing.T) {

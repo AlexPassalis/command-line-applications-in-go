@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"text/tabwriter"
 
-	counter "github.com/AlexPassalis/command-line-applications-in-go"
-	display "github.com/AlexPassalis/command-line-applications-in-go/display"
+	counter "github.com/AlexPassalis/command-line-applications-in-go/counter"
+	display "github.com/AlexPassalis/command-line-applications-in-go/counter/display"
 )
 
 func main() {
@@ -48,7 +49,7 @@ func main() {
 
 	log.SetFlags(0) // clears all log built-in prefixes.
 
-	writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, ' ', tabwriter.AlignRight)
+	tabWriter := tabwriter.NewWriter(os.Stdout, 0, 8, 1, ' ', tabwriter.AlignRight)
 
 	totals := counter.Counts{}
 
@@ -56,30 +57,44 @@ func main() {
 		fmt.Fprintln(os.Stdout, "lines\twords\tbytes")
 	}
 
-	didError := false
 	filenames := flag.Args()
+	waitGroup := sync.WaitGroup{}
+	waitGroup.Add(len(filenames))
+
+	lock := sync.Mutex{}
+
+	didError := false
 	for _, filename := range filenames {
-		counts, err := counter.CountFile(filename)
-		if err != nil {
-			didError = true
-			fmt.Fprintln(os.Stderr, "counter:", err)
-			continue
-		}
+		go func() {
+			defer waitGroup.Done()
 
-		totals = totals.Add(counts)
+			counts, err := counter.CountFile(filename)
+			if err != nil {
+				didError = true
+				fmt.Fprintln(os.Stderr, "counter:", err)
+				return
+			}
 
-		counts.Print(os.Stdout, options, filename)
+			lock.Lock()
+			defer lock.Unlock()
+			// State mutated below
+			totals = totals.Add(counts)
+			counts.Print(tabWriter, options, filename)
+
+		}()
 	}
 
-	if len(filenames) == 0 {
-		counter.GetCounts(os.Stdin).Print(writer, options)
-	}
+	waitGroup.Wait()
 
 	if len(filenames) > 1 {
 		totals.Print(os.Stdout, options, "total")
 	}
 
-	writer.Flush()
+	if len(filenames) == 0 {
+		counter.GetCounts(os.Stdin).Print(tabWriter, options)
+	}
+
+	tabWriter.Flush()
 
 	if didError {
 		os.Exit(1)

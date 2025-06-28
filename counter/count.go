@@ -9,7 +9,7 @@ import (
 	"strings"
 	"unicode"
 
-	display "github.com/AlexPassalis/command-line-applications-in-go/display"
+	display "github.com/AlexPassalis/command-line-applications-in-go/counter/display"
 )
 
 type Counts struct {
