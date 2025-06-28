@@ -93,34 +93,36 @@ func CountBytes(reader io.Reader) int {
 	return int(byteCount)
 }
 
-func GetCounts(r io.Reader) Counts {
-	pipe1Reader, pipe1Writer := io.Pipe()
-	pipe2Reader, pipe2Writer := io.Pipe()
+func GetCounts(reader io.Reader) Counts {
+	byteReader, byteWriter := io.Pipe()
+	wordReader, wordWriter := io.Pipe()
+	lineReader, lineWriter := io.Pipe()
 
-	byteReader := io.TeeReader(r, pipe1Writer)
-	wordReader := io.TeeReader(pipe1Reader, pipe2Writer)
-	linesReader := pipe2Reader
+	writer := io.MultiWriter(byteWriter, wordWriter, lineWriter)
 
 	channelBytes := make(chan int)
 	channelWords := make(chan int)
 	channelLines := make(chan int)
 
 	go func() {
-		defer pipe1Writer.Close()
 		defer close(channelBytes)
 		channelBytes <- CountBytes(byteReader)
 	}()
 
 	go func() {
-		defer pipe2Writer.Close()
 		defer close(channelWords)
 		channelWords <- CountWords(wordReader)
 	}()
 
 	go func() {
 		defer close(channelLines)
-		channelLines <- CountLines(linesReader)
+		channelLines <- CountLines(lineReader)
 	}()
+
+	io.Copy(writer, reader)
+	byteWriter.Close()
+	wordWriter.Close()
+	lineWriter.Close()
 
 	byteCount := <-channelBytes
 	wordCount := <-channelWords
