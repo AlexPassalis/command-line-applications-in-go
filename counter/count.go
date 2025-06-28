@@ -2,7 +2,6 @@ package count
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -95,15 +94,37 @@ func CountBytes(reader io.Reader) int {
 }
 
 func GetCounts(r io.Reader) Counts {
-	buffer1 := &bytes.Buffer{}
-	buffer2 := &bytes.Buffer{}
-	byteReader := io.TeeReader(r, buffer1)
-	wordReader := io.TeeReader(buffer1, buffer2)
-	linesReader := buffer2
+	pipe1Reader, pipe1Writer := io.Pipe()
+	pipe2Reader, pipe2Writer := io.Pipe()
 
-	byteCount := CountBytes(byteReader)
-	wordCount := CountWords(wordReader)
-	lineCount := CountLines(linesReader)
+	byteReader := io.TeeReader(r, pipe1Writer)
+	wordReader := io.TeeReader(pipe1Reader, pipe2Writer)
+	linesReader := pipe2Reader
+
+	channelBytes := make(chan int)
+	channelWords := make(chan int)
+	channelLines := make(chan int)
+
+	go func() {
+		defer pipe1Writer.Close()
+		defer close(channelBytes)
+		channelBytes <- CountBytes(byteReader)
+	}()
+
+	go func() {
+		defer pipe2Writer.Close()
+		defer close(channelWords)
+		channelWords <- CountWords(wordReader)
+	}()
+
+	go func() {
+		defer close(channelLines)
+		channelLines <- CountLines(linesReader)
+	}()
+
+	byteCount := <-channelBytes
+	wordCount := <-channelWords
+	lineCount := <-channelLines
 
 	return Counts{
 		bytes: byteCount,

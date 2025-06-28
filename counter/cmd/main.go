@@ -60,7 +60,7 @@ func main() {
 	totals := counter.Counts{}
 
 	if arguments.ShowHeaders {
-		fmt.Fprintln(tabWriter, "lines\twords\tbytes")
+		fmt.Fprintln(tabWriter, "lines\twords\tbytes\t")
 	}
 
 	filenames := flag.Args()
