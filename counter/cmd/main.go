@@ -12,6 +12,11 @@ import (
 	display "github.com/AlexPassalis/command-line-applications-in-go/counter/display"
 )
 
+type FileCountsResult struct {
+	counts   counter.Counts
+	filename string
+}
+
 func main() {
 	arguments := display.NewOptionsArguments{}
 
@@ -54,14 +59,14 @@ func main() {
 	totals := counter.Counts{}
 
 	if arguments.ShowHeaders {
-		fmt.Fprintln(os.Stdout, "lines\twords\tbytes")
+		fmt.Fprintln(tabWriter, "lines\twords\tbytes")
 	}
 
 	filenames := flag.Args()
 	waitGroup := sync.WaitGroup{}
 	waitGroup.Add(len(filenames))
 
-	lock := sync.Mutex{}
+	channel := make(chan FileCountsResult)
 
 	didError := false
 	for _, filename := range filenames {
@@ -75,19 +80,25 @@ func main() {
 				return
 			}
 
-			lock.Lock()
-			defer lock.Unlock()
-			// State mutated below
-			totals = totals.Add(counts)
-			counts.Print(tabWriter, options, filename)
-
+			channel <- FileCountsResult{
+				counts:   counts,
+				filename: filename,
+			}
 		}()
 	}
 
-	waitGroup.Wait()
+	go func() {
+		waitGroup.Wait()
+		close(channel)
+	}()
+
+	for result := range channel {
+		totals = totals.Add(result.counts)
+		result.counts.Print(tabWriter, options, result.filename)
+	}
 
 	if len(filenames) > 1 {
-		totals.Print(os.Stdout, options, "total")
+		totals.Print(tabWriter, options, "total")
 	}
 
 	if len(filenames) == 0 {
